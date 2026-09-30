@@ -1,12 +1,44 @@
-import {Given, When } from '@cucumber/cucumber';
-import {Browser} from '@playwright/test';
+import {Given, When, Then } from '@cucumber/cucumber';
+import { pageFixture } from './hooks/browserContextFIxture';
+import{expect} from '@playwright/test'
 
-let browser: Browser; //browser instance chrome or forefox opened by playwright
-let context: any; //browser context (a separate browsing session ) each context has its own cookies storage
 Given('User is on sauce demo login page', async () => {
-   console.log("Step 1");
+
+    //setup browser instance added into hooks file using browser and page fixture
+
+//Access url
+await pageFixture.page.goto("https://www.saucedemo.com/");
 });
 
 When('User enters username', async () => {
-    console.log("Step 2");
+    await pageFixture.page.getByPlaceholder("Username").fill("standard_user");
+});
+
+When('User enters password', async () => {
+  await pageFixture.page.getByPlaceholder("Password").fill("secret_sauce");
+});
+
+When('User clicks on Login button', async () => {
+  await pageFixture.page.locator("#login-button").click();
+});
+
+Then('User navigates to Products page', async () => {
+    await pageFixture.page.waitForSelector(".inventory_list", { state: "visible", timeout: 10000 });
+ await expect(pageFixture.page).toHaveURL(/inventory/);
+});
+
+
+When("User enters invalid username", async function () {
+  await pageFixture.page.fill("#user-name", "wrong_user");
+});
+
+When("User enters invalid password", async function () {
+  await pageFixture.page.fill("#password", "wrong_password");
+});
+
+Then('Error message is dispalyed', async () =>{
+const error = await pageFixture.page.getByRole("alert");
+await expect(error).toBeVisible();
+console.log("Displayed");
+
 });
