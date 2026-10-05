@@ -27,7 +27,6 @@ Then('User navigates to Products page', async () => {
  await expect(pageFixture.page).toHaveURL(/inventory/);
 });
 
-
 When("User enters invalid username", async function () {
   await pageFixture.page.fill("#user-name", "wrong_user");
 });
@@ -39,6 +38,7 @@ When("User enters invalid password", async function () {
 Then('Error message is dispalyed', async () =>{
 const error = await pageFixture.page.getByRole("alert");
 await expect(error).toBeVisible();
-console.log("Displayed");
+await expect(error).toContainText("Epic sadface: Username and password do not match any user in this service");
+await console.log("Displayed");
 
 });
