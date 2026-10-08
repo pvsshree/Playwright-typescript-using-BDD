@@ -1,0 +1,74 @@
+@Test @TC5
+    Scenario: Navigate to a facility with an allocated borrower
+        When User navigates to a facility with an allocated borrower "Borrower Z"
+        And Facility amount is $1000000
+        Then The facility view shows "Borrower Z" allocated.
+        Then An editable "Limit" field is available for "Borrower Z"
+        When User enters valid amount $500000 in the "Limit" field for "Borrower Z"
+        Then The value "500000" is accepted into the input field
+        And No validation errors appear.
+        When User save the facility changes
+        Then The changes are saved successfully
+        When User navigate away from facility and then back to it
+        Then The "Limit" field for "Borrower Z" correctly displays the saved value of "500000"
+
+
+@Test @TC9
+    Scenario: Navigate to a deal with defined primary borrower
+       When User navigates to a deal with defined primary borrower
+       Then Deal Primary Borrower becomes "DealPrime" and Deal Additional Borrower becomes "DealSecond"
+       Then The deal overview page correctly shows "DealPrime" as the primary borrower fir the entire deal
+       When User select "Facility J" and allocate both borrowers
+       Then "DealPrime" is default primary for "Facility J" 
+       When User changes the primary borrower for "Facility J" to "DealSecond"
+       Then New Facility Primary becomes "DealSecond"
+       Then On "Facility J" screen, "DealSecond" is now shown as the primary borrower
+       When User save the facility changes
+       Then The changes are saved successfully
+       When User navigate back to main deal overview page 
+       Then The deal overview page shows "DealPrime" as the primary borrower for the deal
+       And The Changes made at the facility level did not propagate to the deal level    
+
+
+
+@Test @TC10
+    Scenario: Navigate to deal with one borrower and two facilities
+       When User navigates to deal with one borrower and two facilities
+       Then Borrower becomes "Universal Borrower" with Facilities "Facility X" having amount $500k and "Facility Y" having amount $2M
+       Then The deal page is loaded
+       When user selects "Facility X" and allocates it as "Universal Borrower"
+       Then "Universal Borrower" is successfully allocated to "Facility X"
+       When User set the limit for "Universal Borrower" for "Facility X" as $300000
+       Then The limit is set to $300000 for "Universal Borrower" in "Facility X"
+       And Changes are saved
+       When User navigates to "Facility Y"
+       Then The "Facility Y" details are displayed "Universal Borrower" is not yet allocated
+       When User allocates "Universal Borrower" to "Facility y"
+       Then "Universal Borrower" is successfully allocated to "Facility Y"
+       And The limit field for this borrower is empty or zero
+       When User set the limit as $1000000 for "Universal Borrower" in "Facility Y"
+       Then The limit is set to $1000000 for "Universal Borrower" in "Facility Y"
+       And Changes are saved
+       When User navigates back to "Facility X" 
+       Then The view for "Facility X" is displayed 
+       And The limit for "Universal Borrower" is shown as $300000
+
+
+
+    @Test @TC11
+    Scenario: Navigate to facility with several allocated borrowers
+       When User navigates to a facility with several allocated borrowers
+       Then The facility shows 4 borrower tags
+       And The allocated borrower count is "4"
+       When User clicks "Select" button or ctrl+click
+       Then Two borrowers are selected
+       And Both borrowers are highlighted or checked indicating they are selected
+       When User selects two borrowers "Delete" or "Remove" button becomes active
+       And User clicks "Delete" or "Remove" button
+       Then A confirmation prompt may appear
+       When User confirms the deletion
+       Then The two selected borrowers are removed from the facility
+       And Tags for remaining two borrowers are still visible
+       And The allocated borrower count is updates from "4" to "2" 
+
+
