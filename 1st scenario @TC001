@@ -1,0 +1,65 @@
+import { When, Then } from '@cucumber/cucumber';
+import { expect } from '@playwright/test';
+import { CustomWorld } from '../support/custom-world';
+
+// Background steps
+When('I login Citi Velocity as {string}', async function (this: CustomWorld, role: string) {
+  await this.page.goto('https://citivelocity.com/login');
+  await this.loginAs(role);
+});
+
+Then('{string} comes Helios Dashboard page', async function (this: CustomWorld, username: string) {
+  await expect(this.page.locator('#dashboard')).toBeVisible();
+  await expect(this.page.locator('#user')).toContainText(username);
+});
+
+Then('Navigate to {string} tab on homepage', async function (this: CustomWorld, tabName: string) {
+  await this.page.click(`text=${tabName}`);
+});
+
+Then('Navigate to Facility overview page', async function (this: CustomWorld) {
+  await this.page.click('text=Facility Overview');
+  await expect(this.page.locator('#facility-overview')).toBeVisible();
+});
+
+// Scenario steps
+When('the user navigates to a deal containing {string}', async function (this: CustomWorld, facilityName: string) {
+  await this.page.click(`text=${facilityName}`);
+});
+
+Then('The user successfully navigates to the deal page', async function (this: CustomWorld) {
+  await expect(this.page.locator('#deal-page')).toBeVisible();
+});
+
+When('The user selects {string} from the list of facilities', async function (this: CustomWorld, facilityName: string) {
+  await this.page.click(`text=${facilityName}`);
+});
+
+Then('The main view updates to show the details for {string}', async function (this: CustomWorld, facilityName: string) {
+  await expect(this.page.locator('#facility-details')).toContainText(facilityName);
+});
+
+When('The User scroll to the {string} section', async function (this: CustomWorld, sectionName: string) {
+  await this.page.locator(`text=${sectionName}`).scrollIntoViewIfNeeded();
+});
+
+Then('The {string} section is visible', async function (this: CustomWorld, sectionName: string) {
+  await expect(this.page.locator(`text=${sectionName}`)).toBeVisible();
+});
+
+Then('A {string} is present', async function (this: CustomWorld, fieldLabel: string) {
+  await expect(this.page.locator(`text=${fieldLabel}`)).toBeVisible();
+});
+
+When('The user selects the value selection metric', async function (this: CustomWorld) {
+  await this.page.click('#value-selection-metric');
+});
+
+Then('Locate the {string} or equivalent summary view for the facility', async function (this: CustomWorld, panelName: string) {
+  await expect(this.page.locator(`text=${panelName}`)).toBeVisible();
+});
+
+Then('The panel is visible and displays a metric for {string} which currently shows {string}', 
+  async function (this: CustomWorld, metricName: string, value: string) {
+    await expect(this.page.locator(`#metric-${metricName}`)).toContainText(value);
+});
