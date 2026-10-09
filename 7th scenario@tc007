@@ -1,0 +1,46 @@
+//7th scenario@tc007
+
+Given('User opens the deal with primary borrower {string} and additional borrower {string}', async (primaryBorrower: string, additionalBorrower: string) => {
+  await page.goto('/deals'); 
+  await page.click(`text=${primaryBorrower}`);
+  await page.click(`text=${additionalBorrower}`);
+});
+
+Then('User is on the deal page', async () => {
+  await expect(page).toHaveURL(/.*deal/);
+});
+
+When('User selects facility {string} that has no borrowers allocated yet', async (facilityName: string) => {
+  await page.click(`text=${facilityName}`);
+});
+
+Then('The facility view is shown', async () => {
+  await expect(page.locator('#facility-view')).toBeVisible();
+});
+
+When('User adds primary borrower {string} to the facility', async (primaryBorrower: string) => {
+  await page.click('#add-borrower');
+  await page.fill('#borrower-input', primaryBorrower);
+  await page.click('#set-primary');
+  await page.click('#confirm-add');
+});
+
+When('User adds additional borrower {string} to the facility', async (additionalBorrower: string) => {
+  await page.click('#add-borrower');
+  await page.fill('#borrower-input', additionalBorrower);
+  await page.click('#confirm-add');
+});
+
+Then('Both borrowers are added to the facility', async () => {
+  await expect(page.locator('.borrower-list')).toContainText(['Prime corp', 'Second corp']);
+});
+
+When('User verifies the primary borrower flag for {string}', async (primaryBorrower: string) => {
+  const borrowerRow = page.locator(`.borrower-list >> text=${primaryBorrower}`);
+  await expect(borrowerRow.locator('.primary-flag')).toBeVisible();
+});
+
+Then('{string} is visually indicated as the primary borrower', async (primaryBorrower: string) => {
+  const borrowerRow = page.locator(`.borrower-list >> text=${primaryBorrower}`);
+  await expect(borrowerRow.locator('.primary-flag')).toHaveText('Primary');
+});
