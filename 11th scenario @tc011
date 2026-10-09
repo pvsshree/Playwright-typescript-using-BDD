@@ -1,0 +1,75 @@
+//11th scenario @tc011
+
+When('User navigates to a facility with several allocated borrowers', async function () {
+  page = this.page;
+  await page.click('text=FacilityWithBorrowers');
+  await expect(page).toHaveURL(/facilities/);
+});
+
+Then('The facility shows {int} borrower tags', async function (count: number) {
+  const tags = page.locator('.borrower-tag');
+  await expect(tags).toHaveCount(count);
+});
+
+Then('The allocated borrower count is {string}', async function (count: string) {
+  const countText = await page.textContent('.allocated-borrower-count');
+  expect(countText).toContain(count);
+});
+
+When('User clicks "Select" button or ctrl+click', async function () {
+  await page.click('button:has-text("Select")');
+  // Alternatively simulate ctrl+click if needed
+  // await page.keyboard.down('Control');
+  // await page.click('.borrower-tag:nth-child(1)');
+  // await page.click('.borrower-tag:nth-child(2)');
+  // await page.keyboard.up('Control');
+});
+
+Then('Two borrowers are selected', async function () {
+  const selected = page.locator('.borrower-tag.selected');
+  await expect(selected).toHaveCount(2);
+});
+
+Then('Both borrowers are highlighted or checked indicating they are selected', async function () {
+  const selected = page.locator('.borrower-tag.selected');
+  await expect(selected.first()).toHaveClass(/selected|checked/);
+});
+
+When('User selects two borrowers "Delete" or "Remove" button becomes active', async function () {
+  const deleteBtn = page.locator('button:has-text("Delete"), button:has-text("Remove")');
+  await expect(deleteBtn).toBeEnabled();
+});
+
+When('User clicks "Delete" or "Remove" button', async function () {
+  await page.click('button:has-text("Delete"), button:has-text("Remove")');
+});
+
+Then('A confirmation prompt may appear', async function () {
+  const prompt = page.locator('.confirmation-prompt');
+  if (await prompt.count()) {
+    await expect(prompt).toBeVisible();
+  }
+});
+
+When('User confirms the deletion', async function () {
+  const confirmBtn = page.locator('button:has-text("Confirm")');
+  if (await confirmBtn.count()) {
+    await confirmBtn.click();
+  }
+});
+
+Then('The two selected borrowers are removed from the facility', async function () {
+  const selected = page.locator('.borrower-tag.selected');
+  await expect(selected).toHaveCount(0);
+});
+
+Then('Tags for remaining two borrowers are still visible', async function () {
+  const remaining = page.locator('.borrower-tag');
+  await expect(remaining).toHaveCount(2);
+});
+
+Then('The allocated borrower count is updates from {string} to {string}', async function (oldCount: string, newCount: string) {
+  const countText = await page.textContent('.allocated-borrower-count');
+  expect(countText).toContain(newCount);
+  expect(countText).not.toContain(oldCount);
+});
