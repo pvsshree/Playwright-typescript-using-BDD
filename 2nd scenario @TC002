@@ -1,0 +1,64 @@
+// dealNoBorrowersSteps.ts
+
+// Step: Navigate to a deal containing "Facility A" and the Master Borrower list is empty
+When(
+  'the user navigates to a deal containing "Facility A" and the Master Borrower list is empty',
+  async () => {
+    await page.goto("https://your-app-url.com/deals");
+    // Locate and open the deal that contains Facility A and has no borrowers
+    await page.click('text=Deal With Facility A');
+    await expect(page.locator("text=Master Borrower List")).toBeVisible();
+    await expect(page.locator("text=No borrowers defined")).toBeVisible();
+  }
+);
+
+// Step: Select "Facility A" from the list of facilities
+When('the user selects "Facility A" from the list of facilities', async () => {
+  await page.click('text=Facility A');
+});
+
+// Step: User successfully navigates to the deal page
+Then("the user successfully navigates to the deal page", async () => {
+  await expect(page.locator("h1")).toHaveText("Deal Page");
+});
+
+// Step: View updates to show details for "Facility A"
+Then('the view updates to show the details for "Facility A"', async () => {
+  await expect(page.locator("h2")).toHaveText("Facility A Details");
+});
+
+// Step: Borrower Allocation section displays warning message
+Then(
+  'the "Borrower Allocation" section displays a clear warning message: "No borrowers are defined in the deal\'s master list. Please add borrowers at the deal level to proceed"',
+  async () => {
+    await expect(
+      page.locator(
+        'text=No borrowers are defined in the deal\'s master list. Please add borrowers at the deal level to proceed'
+      )
+    ).toBeVisible();
+  }
+);
+
+// Step: "Select Borrowers" button or control is not visible or disabled
+Then(
+  'the "Select Borrowers" button or any control to add borrowers is not visible or is disabled',
+  async () => {
+    const selectBorrowersButton = page.locator("button:has-text('Select Borrowers')");
+    await expect(selectBorrowersButton).toHaveCount(0); // not visible
+    // OR if present but disabled
+    if (await selectBorrowersButton.count()) {
+      await expect(selectBorrowersButton).toBeDisabled();
+    }
+  }
+);
+
+// Step: User cannot initiate borrower allocation for the facility
+Then("the user cannot initiate borrower allocation for the facility", async () => {
+  // Verify borrower allocation controls are absent or disabled
+  const allocationControls = page.locator(".borrower-allocation-control");
+  if (await allocationControls.count()) {
+    await expect(allocationControls).toBeDisabled();
+  } else {
+    await expect(allocationControls).toHaveCount(0);
+  }
+});
