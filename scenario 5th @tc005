@@ -1,0 +1,57 @@
+scenario 5th @tc005
+
+When('User navigates to a facility with an allocated borrower {string}', async function (borrowerName: string) {
+  page = this.page;
+  await page.click(`text=${borrowerName}`);
+  await expect(page.locator('.facility-view')).toBeVisible();
+});
+
+When('Facility amount is ${int}', async function (amount: number) {
+  const facilityAmount = await page.textContent('.facility-amount');
+  expect(facilityAmount).toContain(amount.toString());
+});
+
+Then('The facility view shows {string} allocated.', async function (borrowerName: string) {
+  const borrowerText = await page.textContent('.facility-borrower');
+  expect(borrowerText).toContain(`${borrowerName} allocated`);
+});
+
+Then('An editable "Limit" field is available for {string}', async function (borrowerName: string) {
+  const limitField = page.locator(`input[name="limit-${borrowerName}"]`);
+  await expect(limitField).toBeEditable();
+});
+
+When('User enters valid amount {int} in the "Limit" field for {string}', async function (amount: number, borrowerName: string) {
+  const limitField = page.locator(`input[name="limit-${borrowerName}"]`);
+  await limitField.fill(amount.toString());
+});
+
+Then('The value {int} is accepted into the input field', async function (amount: number) {
+  const value = await page.inputValue('input[name^="limit-"]');
+  expect(value).toBe(amount.toString());
+});
+
+Then('No validation errors appear.', async function () {
+  const errors = await page.locator('.validation-error').count();
+  expect(errors).toBe(0);
+});
+
+When('User save the facility changes', async function () {
+  await page.click('button:has-text("Save")');
+});
+
+Then('The changes are saved successfully', async function () {
+  const successMessage = await page.textContent('.notification-success');
+  expect(successMessage).toContain('saved successfully');
+});
+
+When('User navigate away from facility and then back to it', async function () {
+  await page.click('text=Dashboard');
+  await page.click('text=Facilities');
+});
+
+Then('The "Limit" field for {string} correctly displays the saved value of {int}', async function (borrowerName: string, amount: number) {
+  const limitField = page.locator(`input[name="limit-${borrowerName}"]`);
+  const value = await limitField.inputValue();
+  expect(value).toBe(amount.toString());
+});
