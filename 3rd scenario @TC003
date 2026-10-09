@@ -1,0 +1,81 @@
+// 3rd scenario @TC003
+
+When(
+  'the user navigates to {string}, which already has one or more borrowers allocated',
+  async function (facilityName: string) {
+    page = this.page;
+    await page.click(`text=${facilityName}`);
+    await expect(page).toHaveURL(/facilities/);
+  }
+);
+
+Then(
+  'the facility view is displayed with visual tags for {string} and {string}',
+  async function (borrowerX: string, borrowerY: string) {
+    const borrowerXTag = await page.locator(`.borrower-tag:has-text("${borrowerX}")`);
+    const borrowerYTag = await page.locator(`.borrower-tag:has-text("${borrowerY}")`);
+    await expect(borrowerXTag).toBeVisible();
+    await expect(borrowerYTag).toBeVisible();
+  }
+);
+
+Then('the allocated borrower count is {string}', async function (count: string) {
+  const countText = await page.textContent('.allocated-borrower-count');
+  expect(countText).toContain(count);
+});
+
+When('the user locates the visual tag for {string}', async function (borrowerX: string) {
+  const tag = page.locator(`.borrower-tag:has-text("${borrowerX}")`);
+  await expect(tag).toBeVisible();
+});
+
+Then(
+  'the tag for {string} is visible and contains a small "A-" icon',
+  async function (borrowerX: string) {
+    const icon = page.locator(`.borrower-tag:has-text("${borrowerX}") .icon-a-minus`);
+    await expect(icon).toBeVisible();
+  }
+);
+
+When(
+  'the user clicks the "A-" icon on the {string} tag',
+  async function (borrowerX: string) {
+    await page.click(`.borrower-tag:has-text("${borrowerX}") .icon-a-minus`);
+  }
+);
+
+Then(
+  'the visual tag for {string} is removed from UL 2',
+  async function (borrowerX: string) {
+    const tag = page.locator(`#ul2 .borrower-tag:has-text("${borrowerX}")`);
+    await expect(tag).toHaveCount(0);
+  }
+);
+
+Then('the visual tag for {string} remains', async function (borrowerY: string) {
+  const tag = page.locator(`.borrower-tag:has-text("${borrowerY}")`);
+  await expect(tag).toBeVisible();
+});
+
+Then(
+  'the "Allocated Borrowers" count in the Compact Metrics Panel updates from {string} to {string}',
+  async function (oldCount: string, newCount: string) {
+    const metricsText = await page.textContent('.compact-metrics-panel .allocated-borrowers');
+    expect(metricsText).toContain(newCount);
+    expect(metricsText).not.toContain(oldCount);
+  }
+);
+
+When('the user clicks the "Select Borrowers" button to view the list', async function () {
+  await page.click('button:has-text("Select Borrowers")');
+});
+
+Then('{string} is no longer shown as allocated', async function (borrowerX: string) {
+  const allocatedList = page.locator('.allocated-list');
+  await expect(allocatedList.locator(`text=${borrowerX}`)).toHaveCount(0);
+});
+
+Then('{string} appears as available to be selected again', async function (borrowerX: string) {
+  const availableList = page.locator('.available-list');
+  await expect(availableList.locator(`text=${borrowerX}`)).toBeVisible();
+});
