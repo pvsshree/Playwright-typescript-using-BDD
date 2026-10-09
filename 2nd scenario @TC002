@@ -1,4 +1,4 @@
-// dealNoBorrowersSteps.ts
+// 2nd scenario @TC002
 
 // Step: Navigate to a deal containing "Facility A" and the Master Borrower list is empty
 When(
