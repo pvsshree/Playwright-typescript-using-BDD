@@ -1,0 +1,50 @@
+
+//6th scenario @tc006
+Given('User navigates to the facility with allocated borrower {string}', async function (borrowerName: string) {
+  page = this.page;
+  await page.click(`text=${borrowerName}`);
+  await expect(page.locator('.facility-view')).toBeVisible();
+});
+
+Given('The facility amount is ${int}', async function (amount: number) {
+  const facilityAmount = await page.textContent('.facility-amount');
+  expect(facilityAmount).toContain(amount.toString());
+});
+
+When('User enters invalid amount {int} in the limit field', async function (amount: number) {
+  const limitField = page.locator('input[name^="limit-"]');
+  await limitField.fill(amount.toString());
+});
+
+Then('The facility view shows {string} allocated', async function (borrowerName: string) {
+  const borrowerText = await page.textContent('.facility-borrower');
+  expect(borrowerText).toContain(`${borrowerName} allocated`);
+});
+
+Then('The limit field shows "${int}"', async function (amount: number) {
+  const value = await page.inputValue('input[name^="limit-"]');
+  expect(value).toBe(amount.toString());
+});
+
+When('User moves focus away from the limit field', async function () {
+  await page.locator('body').click(); // click elsewhere to blur
+});
+
+Then('A validation error message is displayed', async function () {
+  const errorMessage = page.locator('.validation-error');
+  await expect(errorMessage).toBeVisible();
+});
+
+When('User corrects the limit to {int}', async function (amount: number) {
+  const limitField = page.locator('input[name^="limit-"]');
+  await limitField.fill(amount.toString());
+});
+
+When('User clicks the save button', async function () {
+  await page.click('button:has-text("Save")');
+});
+
+Then('The validation error message disappears', async function () {
+  const errorMessage = page.locator('.validation-error');
+  await expect(errorMessage).toHaveCount(0);
+});
