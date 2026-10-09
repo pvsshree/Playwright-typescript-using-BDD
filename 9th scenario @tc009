@@ -1,0 +1,61 @@
+//9th scenario @tc009
+
+
+When('User navigates to a deal with defined primary borrower', async function () {
+  await this.page.goto('https://your-app-url/deals');
+  // Assume navigation logic to open the deal
+});
+
+Then('Deal Primary Borrower becomes {string} and Deal Additional Borrower becomes {string}', async function (primary, additional) {
+  const primaryBorrower = await this.page.locator('#dealPrimaryBorrower').innerText();
+  const additionalBorrower = await this.page.locator('#dealAdditionalBorrower').innerText();
+  expect(primaryBorrower).toBe(primary);
+  expect(additionalBorrower).toBe(additional);
+});
+
+Then('The deal overview page correctly shows {string} as the primary borrower for the entire deal', async function (primary) {
+  await expect(this.page.locator('#dealOverviewPrimary')).toContainText(primary);
+});
+
+When('User select {string} and allocate both borrowers', async function (facility) {
+  await this.page.click(`text=${facility}`);
+  await this.page.click('#allocateBorrowersButton');
+});
+
+Then('{string} is default primary for {string}', async function (primary, facility) {
+  await expect(this.page.locator(`#facility-${facility}-primaryBorrower`)).toContainText(primary);
+});
+
+When('User changes the primary borrower for {string} to {string}', async function (facility, newPrimary) {
+  await this.page.selectOption(`#facility-${facility}-primaryBorrowerDropdown`, newPrimary);
+});
+
+Then('New Facility Primary becomes {string}', async function (newPrimary) {
+  await expect(this.page.locator('#facilityPrimaryBorrower')).toContainText(newPrimary);
+});
+
+Then('On {string} screen, {string} is now shown as the primary borrower', async function (facility, newPrimary) {
+  await expect(this.page.locator(`#facility-${facility}-primaryBorrower`)).toContainText(newPrimary);
+});
+
+When('User save the facility changes', async function () {
+  await this.page.click('#saveFacilityButton');
+});
+
+Then('The changes are saved successfully', async function () {
+  await expect(this.page.locator('#saveConfirmation')).toBeVisible();
+});
+
+When('User navigate back to main deal overview page', async function () {
+  await this.page.click('#dealOverviewTab');
+});
+
+Then('The deal overview page shows {string} as the primary borrower for the deal', async function (primary) {
+  await expect(this.page.locator('#dealOverviewPrimary')).toContainText(primary);
+});
+
+Then('The Changes made at the facility level did not propagate to the deal level', async function () {
+  const dealPrimary = await this.page.locator('#dealOverviewPrimary').innerText();
+  const facilityPrimary = await this.page.locator('#facilityPrimaryBorrower').innerText();
+  expect(dealPrimary).not.toBe(facilityPrimary);
+});
