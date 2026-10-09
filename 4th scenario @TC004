@@ -1,4 +1,4 @@
-4th scenario @TC004
+//4th scenario @TC004
 
 When('User navigates to {string} with at least two borrowers allocated', async function (facilityName: string) {
   page = this.page;
