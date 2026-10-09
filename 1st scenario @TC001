@@ -1,7 +1,4 @@
-import { When, Then } from '@cucumber/cucumber';
-import { expect } from '@playwright/test';
-import { CustomWorld } from '../support/custom-world';
-
+//1st scenario @TC001
 // Background steps
 When('I login Citi Velocity as {string}', async function (this: CustomWorld, role: string) {
   await this.page.goto('https://citivelocity.com/login');
