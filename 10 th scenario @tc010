@@ -1,4 +1,4 @@
-//10 th scenario @tc10 
+//10 th scenario @tc010 
 
 When('User navigates to deal with one borrower and two facilities', async function () {
   await page.goto('/deal/one-borrower-two-facilities');
