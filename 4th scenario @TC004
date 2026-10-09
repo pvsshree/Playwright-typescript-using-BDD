@@ -1,0 +1,50 @@
+4th scenario @TC004
+
+When('User navigates to {string} with at least two borrowers allocated', async function (facilityName: string) {
+  page = this.page;
+  await page.click(`text=${facilityName}`);
+  await expect(page).toHaveURL(/facilities/);
+});
+
+Then('the {string} section shows {string} and {string} are allocated', async function (section: string, borrower1: string, borrower2: string) {
+  const sectionText = await page.textContent(`.section-${section.toLowerCase().replace(/\s+/g, '-')}`);
+  expect(sectionText).toContain(borrower1);
+  expect(sectionText).toContain(borrower2);
+});
+
+Then('the {string} dropdown is set to {string}', async function (dropdownLabel: string, expectedValue: string) {
+  const dropdownValue = await page.inputValue(`select[name="${dropdownLabel}"]`);
+  expect(dropdownValue).toBe(expectedValue);
+});
+
+When('User clicks on the {string} dropdown', async function (dropdownLabel: string) {
+  await page.click(`select[name="${dropdownLabel}"]`);
+});
+
+Then('a list of options appears containing {string}', async function (optionText: string) {
+  const options = await page.$$eval(`select option`, opts => opts.map(o => o.textContent));
+  expect(options).toContain(optionText);
+});
+
+When('User selects {string} from the dropdown', async function (newValue: string) {
+  await page.selectOption('select[name="Joint & Several"]', { label: newValue });
+});
+
+Then('the dropdown displays {string}', async function (expectedValue: string) {
+  const dropdownValue = await page.inputValue('select[name="Joint & Several"]');
+  expect(dropdownValue).toBe(expectedValue);
+});
+
+When('User clicks Save', async function () {
+  await page.click('button:has-text("Save")');
+  await page.waitForTimeout(1000); // wait for save to complete
+});
+
+When('User reloads the page', async function () {
+  await page.reload();
+});
+
+Then('the {string} dropdown retains the value {string}', async function (dropdownLabel: string, expectedValue: string) {
+  const dropdownValue = await page.inputValue(`select[name="${dropdownLabel}"]`);
+  expect(dropdownValue).toBe(expectedValue);
+});
