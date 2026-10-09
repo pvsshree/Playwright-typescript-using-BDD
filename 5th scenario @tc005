@@ -1,4 +1,4 @@
-scenario 5th @tc005
+//scenario 5th @tc005
 
 When('User navigates to a facility with an allocated borrower {string}', async function (borrowerName: string) {
   page = this.page;
