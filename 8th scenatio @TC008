@@ -1,0 +1,56 @@
+//8th scenatio @TC008
+
+
+import { When, Then } from "@cucumber/cucumber";
+import { expect } from "@playwright/test";
+import { page } from "../support/hooks"; // adjust import if your hooks file differs
+
+When('User navigates to a {string} with default primary borrower and at least one additional borrower', async function (facilityName) {
+  await page.goto(`/facility/${facilityName}`);
+});
+
+Then('Primary Borrower becomes {string} and Additional Borrower {string}', async function (primaryBorrower, additionalBorrower) {
+  const primaryText = await page.locator('#primary-borrower').innerText();
+  const additionalText = await page.locator('#additional-borrower').innerText();
+  expect(primaryText).toContain(primaryBorrower);
+  expect(additionalText).toContain(additionalBorrower);
+});
+
+Then('UI shows {string} in the primary section and {string} as the additional section', async function (primaryBorrower, additionalBorrower) {
+  await expect(page.locator('#primary-borrower')).toHaveText(primaryBorrower);
+  await expect(page.locator('#additional-borrower')).toHaveText(additionalBorrower);
+});
+
+When('User locates {string} borrower in "Additional Borrowers" section', async function (borrowerName) {
+  await expect(page.locator('#additional-borrower')).toContainText(borrowerName);
+});
+
+Then('An option to "Make Primary" is available for {string}', async function (borrowerName) {
+  await expect(page.locator(`button[aria-label="Make Primary"][data-borrower="${borrowerName}"]`)).toBeVisible();
+});
+
+When('User activates "Make Primary" option for {string}', async function (borrowerName) {
+  await page.click(`button[aria-label="Make Primary"][data-borrower="${borrowerName}"]`);
+});
+
+Then('The UI dynamically updates without a fullpage reload', async function () {
+  await expect(page.locator('#loading-indicator')).toBeHidden();
+});
+
+Then('{string} moves from "Additional Borrowers" section to the "Primary Borrower" section', async function (borrowerName) {
+  await expect(page.locator('#primary-borrower')).toHaveText(borrowerName);
+});
+
+Then('{string} moves from "Primary Borrower" section to "Additional Borrowers" section', async function (borrowerName) {
+  await expect(page.locator('#additional-borrower')).toContainText(borrowerName);
+});
+
+When('User Save the changes and reload the facility page', async function () {
+  await page.click('#save-button');
+  await page.reload();
+});
+
+Then('{string} remains in "Primary Borrower" section and {string} remains in the "Additional Borrowers" section', async function (newPrimary, oldPrimary) {
+  await expect(page.locator('#primary-borrower')).toHaveText(newPrimary);
+  await expect(page.locator('#additional-borrower')).toContainText(oldPrimary);
+});
