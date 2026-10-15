@@ -14,18 +14,15 @@
 
 
 @Test @TC8
-    Scenario: Navigate to a Facility with default primary borrower and at least one additional borrower
-        When User navigates to a "Facility H" with default primary borrower and at least one additional borrower
-        Then Primary Borrower becomes "OldPrimary" and Additional Borrower  "NewPrimary"
-        Then UI shows "OldPrimary" in the primary section and "NewPrimary" as the additional section
-        When User locates "NewPrimary" borrower in "Additional Borrowers" section
-        Then An option to "Make Pimary" is available for "NewPrimary"
-        When User activates "Make Primary" option for "NewPrimary"
-        Then The UI dynamically updates without a fullpage reload
-        And "NewPrimary" moves from "Additional Borrowers" section to the "Primary Borrower" section
-        And "OldPrimary" moves from "Primary Borrower" section to "Additional Borrowers" section
+    Scenario: Navigate to a Facility with default Primary Borrower and at least one Additional Borrowers
+        When User navigates to a Facility 4 with default primary borrower and at least one Additional Borrowers
+        Then UI shows "" in the Primary Borrower and "" in the Additional Borrowers
+        Then In Additional Borrowers section an option to make Primary Borrower Flag is available for ""
+        When User clicks on Primary Borrower Flag
+        Then "" moves from Additional Borrowers section to the Primary Borrower section
+        And "" moves from Primary Borrower section to Additional Borrowers section
         When User Save the changes and reload the facility page
-        Then "NewPrimary" remains in "Primary Borrower" section and "OldPrimary" remains in the "Additional Borrowers" section 
+        Then "" remains in Primary Borrower section and "" remains in the Additional Borrowers section 
 
 
 
