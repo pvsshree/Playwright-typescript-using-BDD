@@ -1,0 +1,11 @@
+
+
+User Story ID
+CLDC- 176463
+
+TC1
+In Joint and Several dropdown default value should be "Joint" but on Application it is set as "Select"
+
+TC2
+when no borrower is selected in "Borrower allocation" dropdown, no warning message is displayed
+
